@@ -27,8 +27,8 @@ interface ProductDialogProps {
   product?: Product | null;
 }
 
-const categories = ["Vegetables", "Meat", "Spices", "Grains", "Dairy", "Fruits"];
-const colors = ["Red", "Green", "White", "Orange", "Yellow", "Brown", "Mixed"];
+const categories = ["Sayuran", "Daging", "Bumbu", "Biji-bijian", "Produk Susu", "Buah-buahan"];
+const colors = ["Merah", "Hijau", "Putih", "Oranye", "Kuning", "Coklat", "Campuran"];
 
 export const ProductDialog = ({ open, onOpenChange, onSubmit, product }: ProductDialogProps) => {
   const { register, handleSubmit, reset, setValue, watch } = useForm<ProductFormData>({
@@ -72,29 +72,29 @@ export const ProductDialog = ({ open, onOpenChange, onSubmit, product }: Product
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] flex flex-col items-center justify-center">
         <DialogHeader>
-          <DialogTitle>{product ? "Edit Raw Material" : "Add New Raw Material"}</DialogTitle>
+          <DialogTitle>{product ? "Edit Bahan Baku" : "Tambah Bahan Baku Baru"}</DialogTitle>
           <DialogDescription>
-            {product ? "Update the raw material details below." : "Fill in the raw material details below."}
+            {product ? "Perbarui detail bahan baku di bawah ini." : "Isi detail bahan baku di bawah ini."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4 w-full">
             <div className="grid gap-2">
-              <Label htmlFor="name">Raw Material Name</Label>
+              <Label htmlFor="name">Nama Bahan Baku</Label>
               <Input
                 id="name"
-                placeholder="e.g., Chicken, Carrots, Rice"
+                placeholder="Contoh: Ayam, Wortel, Beras"
                 {...register("name", { required: true })}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="color">Color</Label>
+                <Label htmlFor="color">Warna</Label>
                 <Select value={selectedColor} onValueChange={(value) => setValue("color", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select color" />
+                    <SelectValue placeholder="Pilih warna" />
                   </SelectTrigger>
                   <SelectContent>
                     {colors.map((color) => (
@@ -106,10 +106,10 @@ export const ProductDialog = ({ open, onOpenChange, onSubmit, product }: Product
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">Kategori</Label>
                 <Select value={selectedCategory} onValueChange={(value) => setValue("category", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="Pilih kategori" />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -123,7 +123,7 @@ export const ProductDialog = ({ open, onOpenChange, onSubmit, product }: Product
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="price">Price (IDR)</Label>
+                <Label htmlFor="price">Harga (IDR)</Label>
                 <Input
                   id="price"
                   type="number"
@@ -132,7 +132,7 @@ export const ProductDialog = ({ open, onOpenChange, onSubmit, product }: Product
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="quantity">Quantity</Label>
+                <Label htmlFor="quantity">Jumlah</Label>
                 <Input
                   id="quantity"
                   type="number"
@@ -144,9 +144,9 @@ export const ProductDialog = ({ open, onOpenChange, onSubmit, product }: Product
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Batal
             </Button>
-            <Button type="submit">{product ? "Update Raw Material" : "Add Raw Material"}</Button>
+            <Button type="submit">{product ? "Perbarui Bahan Baku" : "Tambah Bahan Baku"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

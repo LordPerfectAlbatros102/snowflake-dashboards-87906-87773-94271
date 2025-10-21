@@ -36,8 +36,8 @@ const Invoices = () => {
     } catch (error) {
       console.error("Error fetching invoices:", error);
       toast({
-        title: "Error",
-        description: "Failed to load invoices",
+        title: "Kesalahan",
+        description: "Gagal memuat faktur",
         variant: "destructive",
       });
     } finally {
@@ -63,15 +63,15 @@ const Invoices = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center gap-2">
           <FileText className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-bold text-foreground">Invoices</h1>
+          <h1 className="text-3xl font-bold text-foreground">Faktur</h1>
         </div>
 
         {loading ? (
-          <p className="text-muted-foreground">Loading invoices...</p>
+          <p className="text-muted-foreground">Memuat faktur...</p>
         ) : invoices.length === 0 ? (
           <Card>
             <CardContent className="py-10 text-center">
-              <p className="text-muted-foreground">No invoices found</p>
+              <p className="text-muted-foreground">Tidak ada faktur</p>
             </CardContent>
           </Card>
         ) : (

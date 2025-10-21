@@ -44,8 +44,8 @@ const Profile = () => {
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast({
-        title: "Error",
-        description: "Failed to load profile data",
+        title: "Kesalahan",
+        description: "Gagal memuat data profil",
         variant: "destructive",
       });
     } finally {
@@ -56,7 +56,7 @@ const Profile = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <p className="text-muted-foreground">Loading profile...</p>
+        <p className="text-muted-foreground">Memuat profil...</p>
       </div>
     );
   }
@@ -66,12 +66,12 @@ const Profile = () => {
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center gap-2 mb-6">
           <User className="w-8 h-8 text-primary" />
-          <h1 className="text-3xl font-bold text-foreground">Profile</h1>
+          <h1 className="text-3xl font-bold text-foreground">Profil</h1>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>User Information</CardTitle>
+            <CardTitle>Informasi Pengguna</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center gap-4">
@@ -83,7 +83,7 @@ const Profile = () => {
               </Avatar>
               <div>
                 <h2 className="text-2xl font-semibold text-foreground">
-                  {profile?.full_name || "User"}
+                  {profile?.full_name || "Pengguna"}
                 </h2>
                 <p className="text-muted-foreground">{user?.email}</p>
               </div>
@@ -101,7 +101,7 @@ const Profile = () => {
               <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
                 <Calendar className="w-5 h-5 text-primary mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-foreground">Joined</p>
+                  <p className="text-sm font-medium text-foreground">Bergabung</p>
                   <p className="text-sm text-muted-foreground">
                     {new Date(user?.created_at).toLocaleDateString()}
                   </p>
@@ -111,7 +111,7 @@ const Profile = () => {
               <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
                 <Shield className="w-5 h-5 text-primary mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-foreground">Roles</p>
+                  <p className="text-sm font-medium text-foreground">Peran</p>
                   <div className="flex gap-2 mt-1 flex-wrap">
                     {roles.length > 0 ? (
                       roles.map((role) => (
@@ -120,7 +120,7 @@ const Profile = () => {
                         </Badge>
                       ))
                     ) : (
-                      <Badge variant="secondary">user</Badge>
+                      <Badge variant="secondary">pengguna</Badge>
                     )}
                   </div>
                 </div>
@@ -129,7 +129,7 @@ const Profile = () => {
               <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
                 <User className="w-5 h-5 text-primary mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-foreground">User ID</p>
+                  <p className="text-sm font-medium text-foreground">ID Pengguna</p>
                   <p className="text-xs text-muted-foreground font-mono">
                     {user?.id.slice(0, 20)}...
                   </p>

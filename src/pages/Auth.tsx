@@ -42,13 +42,13 @@ const Auth = () => {
       if (error) throw error;
 
       toast({
-        title: "Account Created!",
-        description: "Your account has been successfully created.",
+        title: "Akun Dibuat!",
+        description: "Akun Anda telah berhasil dibuat.",
       });
       setIsLogin(true);
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Kesalahan",
         description: error.message,
         variant: "destructive",
       });
@@ -70,13 +70,13 @@ const Auth = () => {
       if (error) throw error;
 
       toast({
-        title: "Welcome back!",
-        description: "You've successfully signed in.",
+        title: "Selamat datang kembali!",
+        description: "Anda berhasil masuk.",
       });
       navigate("/");
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Kesalahan",
         description: error.message,
         variant: "destructive",
       });
@@ -97,7 +97,7 @@ const Auth = () => {
       if (error) throw error;
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Kesalahan",
         description: error.message,
         variant: "destructive",
       });
@@ -116,25 +116,25 @@ const Auth = () => {
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
                 <div className="w-6 h-6 rounded-lg bg-primary-foreground/90" />
               </div>
-              <h1 className="text-2xl font-bold text-foreground">MBG Raw Materials</h1>
+              <h1 className="text-2xl font-bold text-foreground">Bahan Baku MBG</h1>
             </div>
             
             <div>
               <p className="text-sm text-muted-foreground uppercase tracking-wide mb-2">
-                {isLogin ? "WELCOME BACK" : "START FOR FREE"}
+                {isLogin ? "SELAMAT DATANG KEMBALI" : "MULAI GRATIS"}
               </p>
               <h2 className="text-4xl font-bold text-foreground mb-2">
-                {isLogin ? "Log in" : "Create new account"}
+                {isLogin ? "Masuk" : "Buat akun baru"}
                 <span className="text-primary">.</span>
               </h2>
               <p className="text-muted-foreground">
                 {isLogin ? (
                   <>
-                    New to platform? <button onClick={() => setIsLogin(false)} className="text-primary hover:underline font-medium">Create account</button>
+                    Baru di platform? <button onClick={() => setIsLogin(false)} className="text-primary hover:underline font-medium">Buat akun</button>
                   </>
                 ) : (
                   <>
-                    Already a member? <button onClick={() => setIsLogin(true)} className="text-primary hover:underline font-medium">Log in</button>
+                    Sudah punya akun? <button onClick={() => setIsLogin(true)} className="text-primary hover:underline font-medium">Masuk</button>
                   </>
                 )}
               </p>
@@ -147,7 +147,7 @@ const Auth = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="first-name" className="text-sm font-medium text-foreground">
-                    First name
+                    Nama Depan
                   </Label>
                   <div className="relative">
                     <Input
@@ -166,7 +166,7 @@ const Auth = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="last-name" className="text-sm font-medium text-foreground">
-                    Last name
+                    Nama Belakang
                   </Label>
                   <div className="relative">
                     <Input
@@ -209,7 +209,7 @@ const Auth = () => {
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
+                Kata Sandi
               </Label>
               <div className="relative">
                 <Input
@@ -236,7 +236,7 @@ const Auth = () => {
             {isLogin && (
               <div className="text-right">
                 <button className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Forgot password?
+                  Lupa kata sandi?
                 </button>
               </div>
             )}
@@ -250,10 +250,10 @@ const Auth = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
+                  Memproses...
                 </>
               ) : (
-                isLogin ? "Log in" : "Create account"
+                isLogin ? "Masuk" : "Buat akun"
               )}
             </Button>
 
@@ -262,7 +262,7 @@ const Auth = () => {
                 <div className="w-full border-t border-border"></div>
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-4 text-muted-foreground">or</span>
+                <span className="bg-background px-4 text-muted-foreground">atau</span>
               </div>
             </div>
 
@@ -273,7 +273,7 @@ const Auth = () => {
               type="button"
             >
               <Chrome className="mr-2 h-5 w-5" />
-              <span className="font-medium">Continue with Google</span>
+              <span className="font-medium">Lanjutkan dengan Google</span>
             </Button>
           </div>
         </div>
@@ -286,13 +286,13 @@ const Auth = () => {
           <div className="space-y-6 max-w-lg">
             <div className="space-y-3">
               <div className="inline-block px-4 py-2 bg-background/90 backdrop-blur-sm rounded-full text-sm font-medium border border-border">
-                ✨ Enterprise-Grade Management
+                ✨ Manajemen Kelas Enterprise
               </div>
               <h3 className="text-4xl font-bold text-foreground">
-                Manage your raw materials with precision
+                Kelola bahan baku Anda dengan presisi
               </h3>
               <p className="text-lg text-muted-foreground">
-                Track inventory, create invoices, and manage returns all in one place. Built for modern food supply chains.
+                Lacak inventori, buat faktur, dan kelola pengembalian dalam satu tempat. Dibangun untuk rantai pasokan makanan modern.
               </p>
             </div>
             
@@ -302,8 +302,8 @@ const Auth = () => {
                   <Chrome className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-1">Real-time Analytics</h4>
-                  <p className="text-sm text-muted-foreground">Track your inventory and performance metrics in real-time.</p>
+                  <h4 className="font-semibold text-foreground mb-1">Analitik Real-time</h4>
+                  <p className="text-sm text-muted-foreground">Lacak inventori dan metrik kinerja Anda secara real-time.</p>
                 </div>
               </div>
               
@@ -312,8 +312,8 @@ const Auth = () => {
                   <Chrome className="w-5 h-5 text-accent" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-foreground mb-1">Quality Control</h4>
-                  <p className="text-sm text-muted-foreground">Comprehensive food inspection and quality management.</p>
+                  <h4 className="font-semibold text-foreground mb-1">Kontrol Kualitas</h4>
+                  <p className="text-sm text-muted-foreground">Inspeksi makanan dan manajemen kualitas yang komprehensif.</p>
                 </div>
               </div>
             </div>

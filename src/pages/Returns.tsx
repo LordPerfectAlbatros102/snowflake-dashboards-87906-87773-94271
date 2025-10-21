@@ -49,8 +49,8 @@ const Returns = () => {
     } catch (error) {
       console.error("Error fetching returns:", error);
       toast({
-        title: "Error",
-        description: "Failed to load returns",
+        title: "Kesalahan",
+        description: "Gagal memuat pengembalian",
         variant: "destructive",
       });
     } finally {
@@ -80,8 +80,8 @@ const Returns = () => {
       if (error) throw error;
 
       toast({
-        title: "Return Created",
-        description: "Your return request has been submitted.",
+        title: "Pengembalian Dibuat",
+        description: "Permintaan pengembalian Anda telah dikirim.",
       });
 
       setDialogOpen(false);
@@ -90,8 +90,8 @@ const Returns = () => {
     } catch (error) {
       console.error("Error creating return:", error);
       toast({
-        title: "Error",
-        description: "Failed to create return",
+        title: "Kesalahan",
+        description: "Gagal membuat pengembalian",
         variant: "destructive",
       });
     }
@@ -116,23 +116,23 @@ const Returns = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
             <PackageX className="w-8 h-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">Returns</h1>
+            <h1 className="text-3xl font-bold text-foreground">Pengembalian</h1>
           </div>
           
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
                 <Plus className="w-4 h-4" />
-                New Return
+                Pengembalian Baru
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="flex flex-col items-center justify-center">
               <DialogHeader>
-                <DialogTitle>Create Return Request</DialogTitle>
+                <DialogTitle>Buat Permintaan Pengembalian</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 w-full">
                 <div>
-                  <Label htmlFor="product_name">Product Name</Label>
+                  <Label htmlFor="product_name">Nama Bahan Baku</Label>
                   <Input
                     id="product_name"
                     value={formData.product_name}
@@ -141,7 +141,7 @@ const Returns = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="quantity">Quantity</Label>
+                  <Label htmlFor="quantity">Jumlah</Label>
                   <Input
                     id="quantity"
                     type="number"
@@ -151,7 +151,7 @@ const Returns = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="reason">Reason</Label>
+                  <Label htmlFor="reason">Alasan</Label>
                   <Textarea
                     id="reason"
                     value={formData.reason}
@@ -159,18 +159,18 @@ const Returns = () => {
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full">Submit Return</Button>
+                <Button type="submit" className="w-full">Kirim Pengembalian</Button>
               </form>
             </DialogContent>
           </Dialog>
         </div>
 
         {loading ? (
-          <p className="text-muted-foreground">Loading returns...</p>
+          <p className="text-muted-foreground">Memuat pengembalian...</p>
         ) : returns.length === 0 ? (
           <Card>
             <CardContent className="py-10 text-center">
-              <p className="text-muted-foreground">No returns found</p>
+              <p className="text-muted-foreground">Tidak ada pengembalian</p>
             </CardContent>
           </Card>
         ) : (
@@ -188,8 +188,8 @@ const Returns = () => {
                 <CardContent>
                   <div className="space-y-2">
                     <p className="font-semibold">{ret.product_name}</p>
-                    <p className="text-sm text-muted-foreground">Quantity: {ret.quantity}</p>
-                    <p className="text-sm text-muted-foreground">Reason: {ret.reason}</p>
+                    <p className="text-sm text-muted-foreground">Jumlah: {ret.quantity}</p>
+                    <p className="text-sm text-muted-foreground">Alasan: {ret.reason}</p>
                     <p className="text-xs text-muted-foreground">
                       {new Date(ret.created_at).toLocaleDateString()}
                     </p>

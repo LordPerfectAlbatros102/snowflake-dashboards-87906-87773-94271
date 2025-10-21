@@ -50,8 +50,8 @@ const Products = () => {
     } catch (error) {
       console.error("Error fetching products:", error);
       toast({
-        title: "Error",
-        description: "Failed to load products",
+        title: "Kesalahan",
+        description: "Gagal memuat bahan baku",
         variant: "destructive",
       });
     } finally {
@@ -104,8 +104,8 @@ const Products = () => {
         if (error) throw error;
 
         toast({
-          title: "Product updated",
-          description: "The product has been updated successfully.",
+          title: "Bahan Baku Diperbarui",
+          description: "Bahan baku berhasil diperbarui.",
         });
       } else {
         const { error } = await (supabase as any)
@@ -122,8 +122,8 @@ const Products = () => {
         if (error) throw error;
 
         toast({
-          title: "Product added",
-          description: "The product has been added successfully.",
+          title: "Bahan Baku Ditambahkan",
+          description: "Bahan baku berhasil ditambahkan.",
         });
       }
       
@@ -132,8 +132,8 @@ const Products = () => {
     } catch (error) {
       console.error("Error saving product:", error);
       toast({
-        title: "Error",
-        description: "Failed to save product",
+        title: "Kesalahan",
+        description: "Gagal menyimpan bahan baku",
         variant: "destructive",
       });
     }
@@ -158,8 +158,8 @@ const Products = () => {
       if (error) throw error;
 
       toast({
-        title: "Product deleted",
-        description: "The product has been deleted successfully.",
+        title: "Bahan Baku Dihapus",
+        description: "Bahan baku berhasil dihapus.",
         variant: "destructive",
       });
       
@@ -167,8 +167,8 @@ const Products = () => {
     } catch (error) {
       console.error("Error deleting product:", error);
       toast({
-        title: "Error",
-        description: "Failed to delete product",
+        title: "Kesalahan",
+        description: "Gagal menghapus bahan baku",
         variant: "destructive",
       });
     }
@@ -242,14 +242,14 @@ const Products = () => {
       if (itemsError) throw itemsError;
 
       toast({
-        title: "Invoice Created",
-        description: "PDF exported and invoice saved successfully.",
+        title: "Faktur Dibuat",
+        description: "PDF berhasil diekspor dan faktur tersimpan.",
       });
     } catch (error) {
       console.error("Error saving invoice:", error);
       toast({
-        title: "Invoice Saved with Warning",
-        description: "PDF exported but invoice may not be saved to database.",
+        title: "Faktur Tersimpan dengan Peringatan",
+        description: "PDF berhasil diekspor namun faktur mungkin tidak tersimpan ke database.",
         variant: "destructive",
       });
     }
@@ -266,12 +266,12 @@ const Products = () => {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Raw Materials Inventory</h1>
-            <p className="text-muted-foreground">Manage raw food ingredients and materials</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Inventori Bahan Baku</h1>
+            <p className="text-muted-foreground">Kelola bahan dan ingredien makanan</p>
           </div>
           <Button onClick={handleAddNew} className="gap-2 shadow-md hover:shadow-lg transition-shadow">
             <Plus className="w-4 h-4" />
-            Add Raw Material
+            Tambah Bahan Baku
           </Button>
         </div>
 
@@ -279,7 +279,7 @@ const Products = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-2">
-              <p className="text-sm text-muted-foreground">Total Products</p>
+              <p className="text-sm text-muted-foreground">Total Produk</p>
               <div className="p-2 bg-primary/10 rounded-lg">
                 <svg className="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -291,7 +291,7 @@ const Products = () => {
 
           <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-2">
-              <p className="text-sm text-muted-foreground">Total Value</p>
+              <p className="text-sm text-muted-foreground">Total Nilai</p>
               <div className="p-2 bg-accent/10 rounded-lg">
                 <svg className="w-4 h-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -305,7 +305,7 @@ const Products = () => {
 
           <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-2">
-              <p className="text-sm text-muted-foreground">Categories</p>
+              <p className="text-sm text-muted-foreground">Kategori</p>
               <div className="p-2 bg-secondary/50 rounded-lg">
                 <Filter className="w-4 h-4 text-secondary-foreground" />
               </div>
@@ -317,7 +317,7 @@ const Products = () => {
 
           <div className="bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-2">
-              <p className="text-sm text-muted-foreground">Total Stock</p>
+              <p className="text-sm text-muted-foreground">Total Stok</p>
               <div className="p-2 bg-muted rounded-lg">
                 <svg className="w-4 h-4 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
@@ -337,7 +337,7 @@ const Products = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search products..."
+                placeholder="Cari bahan baku..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -346,11 +346,11 @@ const Products = () => {
             <div className="flex gap-2">
               <Button variant="outline" className="gap-2">
                 <Filter className="w-4 h-4" />
-                Filter
+                Saring
               </Button>
               <Button variant="outline" className="gap-2" onClick={handleExportPDF}>
                 <Download className="w-4 h-4" />
-                Export PDF
+                Ekspor PDF
               </Button>
             </div>
           </div>

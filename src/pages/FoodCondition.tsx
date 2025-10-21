@@ -171,7 +171,7 @@ const FoodCondition = () => {
                     Add Inspection
                   </Button>
                 </DialogTrigger>
-              <DialogContent className="max-w-lg">
+              <DialogContent className="max-w-lg flex flex-col items-center justify-center">
                 <DialogHeader>
                   <DialogTitle>Raw Material Quality Inspection Form</DialogTitle>
                 </DialogHeader>

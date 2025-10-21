@@ -237,7 +237,7 @@ const Rejected = () => {
               <Plus className="w-4 h-4" />
               Add Rejected Material
             </Button>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-lg flex flex-col items-center justify-center">
               <DialogHeader>
                 <DialogTitle>Reject Raw Material Form</DialogTitle>
               </DialogHeader>

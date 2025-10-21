@@ -202,7 +202,7 @@ const Projects = () => {
                 <Plus className="w-4 h-4" />
                 Add Supplier
               </Button>
-              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col items-center justify-center">
                 <DialogHeader>
                   <DialogTitle>Add Supplier & Raw Material Delivery</DialogTitle>
                 </DialogHeader>

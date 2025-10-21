@@ -10,42 +10,110 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { toast } from "@/hooks/use-toast";
 
-interface Transaction {
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  color: string;
+  quantity: number;
+  price: number;
+  created_at: string;
+}
+
+interface RejectedItem {
   id: string;
   product_name: string;
   quantity: number;
-  amount: number;
-  status: string;
-  notes: string | null;
-  transaction_date: string;
+  reason: string;
+  created_at: string;
+}
+
+interface FoodCondition {
+  id: string;
+  product_name: string;
+  condition: string;
+  fit_for_processing: boolean;
+  inspection_date: string;
 }
 
 const Analytics = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [rejectedItems, setRejectedItems] = useState<RejectedItem[]>([]);
+  const [foodConditions, setFoodConditions] = useState<FoodCondition[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTransactions();
+    fetchAllData();
+    
+    // Set up real-time updates for products
+    const productsChannel = supabase
+      .channel('products-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        () => fetchAllData()
+      )
+      .subscribe();
+
+    // Set up real-time updates for rejected items
+    const rejectedChannel = supabase
+      .channel('rejected-items-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'rejected_items' },
+        () => fetchAllData()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(productsChannel);
+      supabase.removeChannel(rejectedChannel);
+    };
   }, []);
 
-  const fetchTransactions = async () => {
+  const fetchAllData = async () => {
     try {
-      const { data, error } = await (supabase as any)
-        .from("transactions")
+      // Fetch products
+      const { data: productsData, error: productsError } = await (supabase as any)
+        .from("products")
         .select("*")
-        .order("transaction_date", { ascending: false });
+        .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setTransactions(data || []);
+      if (productsError) throw productsError;
+
+      // Fetch rejected items
+      const { data: rejectedData, error: rejectedError } = await (supabase as any)
+        .from("rejected_items")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (rejectedError) throw rejectedError;
+
+      // Fetch food conditions
+      const { data: conditionsData, error: conditionsError } = await (supabase as any)
+        .from("food_conditions")
+        .select("*")
+        .order("inspection_date", { ascending: false });
+
+      if (conditionsError) throw conditionsError;
+
+      setProducts(productsData || []);
+      setRejectedItems(rejectedData || []);
+      setFoodConditions(conditionsData || []);
     } catch (error) {
-      console.error("Error fetching transactions:", error);
+      console.error("Error fetching data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const approvedTransactions = transactions.filter(t => t.status === "approved");
-  const rejectedTransactions = transactions.filter(t => t.status === "rejected");
+  // Calculate statistics
+  const totalMaterialsValue = products.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+  const totalRejectedQuantity = rejectedItems.reduce((sum, r) => sum + r.quantity, 0);
+  const totalMaterialsInStock = products.reduce((sum, p) => sum + p.quantity, 0);
+  const qualityPassRate = foodConditions.length > 0 
+    ? (foodConditions.filter(f => f.fit_for_processing).length / foodConditions.length * 100).toFixed(1)
+    : 0;
 
   const handleExportPDF = () => {
     const doc = new jsPDF();
@@ -55,19 +123,43 @@ const Analytics = () => {
     
     doc.setFontSize(11);
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 14, 32);
+    doc.text(`Total Materials Value: IDR ${totalMaterialsValue.toLocaleString()}`, 14, 38);
+    doc.text(`Total Stock: ${totalMaterialsInStock} units`, 14, 44);
+    doc.text(`Total Rejected: ${totalRejectedQuantity} units`, 14, 50);
+    doc.text(`Quality Pass Rate: ${qualityPassRate}%`, 14, 56);
     
+    // Products table
+    doc.setFontSize(14);
+    doc.text("Current Inventory", 14, 66);
     autoTable(doc, {
-      startY: 40,
-      head: [['Date', 'Material', 'Quantity', 'Amount', 'Status']],
-      body: transactions.map(t => [
-        format(new Date(t.transaction_date), "MMM dd, yyyy"),
-        t.product_name,
-        t.quantity.toString(),
-        `IDR ${t.amount.toFixed(2)}`,
-        t.status
+      startY: 70,
+      head: [['Material', 'Category', 'Quantity', 'Price', 'Total Value']],
+      body: products.map(p => [
+        p.name,
+        p.category,
+        p.quantity.toString(),
+        `IDR ${p.price.toLocaleString()}`,
+        `IDR ${(p.price * p.quantity).toLocaleString()}`
       ]),
       theme: 'grid',
       headStyles: { fillColor: [79, 70, 229] },
+    });
+    
+    // Rejected items table
+    const finalY = (doc as any).lastAutoTable.finalY || 70;
+    doc.setFontSize(14);
+    doc.text("Rejected Materials", 14, finalY + 15);
+    autoTable(doc, {
+      startY: finalY + 20,
+      head: [['Date', 'Material', 'Quantity', 'Reason']],
+      body: rejectedItems.map(r => [
+        format(new Date(r.created_at), "MMM dd, yyyy"),
+        r.product_name,
+        r.quantity.toString(),
+        r.reason
+      ]),
+      theme: 'grid',
+      headStyles: { fillColor: [220, 38, 38] },
     });
     
     doc.save(`material-analytics-${new Date().toISOString().split('T')[0]}.pdf`);
@@ -79,16 +171,31 @@ const Analytics = () => {
   };
 
   const handleExportExcel = () => {
+    // Combine all data for CSV
+    const csvProducts = products.map(p => [
+      'Product',
+      format(new Date(p.created_at), "MMM dd, yyyy"),
+      p.name,
+      p.category,
+      p.quantity,
+      p.price,
+      p.price * p.quantity
+    ]);
+
+    const csvRejected = rejectedItems.map(r => [
+      'Rejected',
+      format(new Date(r.created_at), "MMM dd, yyyy"),
+      r.product_name,
+      r.reason,
+      r.quantity,
+      '-',
+      '-'
+    ]);
+
     const csvContent = [
-      ['Date', 'Material', 'Quantity', 'Amount', 'Status', 'Notes'],
-      ...transactions.map(t => [
-        format(new Date(t.transaction_date), "MMM dd, yyyy"),
-        t.product_name,
-        t.quantity,
-        t.amount.toFixed(2),
-        t.status,
-        t.notes || ''
-      ])
+      ['Type', 'Date', 'Material', 'Category/Reason', 'Quantity', 'Price', 'Total Value'],
+      ...csvProducts,
+      ...csvRejected
     ].map(row => row.join(',')).join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -121,7 +228,7 @@ const Analytics = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Raw Material Analytics</h1>
-            <p className="text-muted-foreground">Track material transactions and procurement history</p>
+            <p className="text-muted-foreground">Real-time analytics from Raw Materials and Rejected Items</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleExportPDF} variant="outline" className="gap-2">
@@ -135,38 +242,86 @@ const Analytics = () => {
           </div>
         </div>
 
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Materials Value</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">IDR {totalMaterialsValue.toLocaleString()}</div>
+              <p className="text-xs text-muted-foreground mt-1">Current inventory value</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Stock</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">{totalMaterialsInStock}</div>
+              <p className="text-xs text-muted-foreground mt-1">Units in inventory</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Rejected Materials</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-destructive">{totalRejectedQuantity}</div>
+              <p className="text-xs text-muted-foreground mt-1">Units rejected</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Quality Pass Rate</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-foreground">{qualityPassRate}%</div>
+              <p className="text-xs text-muted-foreground mt-1">Materials fit for processing</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Current Inventory */}
         <Card>
           <CardHeader>
-            <CardTitle>Material Procurement History</CardTitle>
-            <CardDescription>Approved raw material transactions</CardDescription>
+            <CardTitle>Current Raw Materials Inventory</CardTitle>
+            <CardDescription>Live data from Raw Materials menu</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
                   <TableHead>Material Name</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Color</TableHead>
                   <TableHead>Quantity</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Total Value</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {approvedTransactions.length === 0 ? (
+                {products.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
-                      No approved transactions yet
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      No materials in inventory
                     </TableCell>
                   </TableRow>
                 ) : (
-                  approvedTransactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell>{format(new Date(transaction.transaction_date), "MMM dd, yyyy")}</TableCell>
-                      <TableCell className="font-medium">{transaction.product_name}</TableCell>
-                      <TableCell>{transaction.quantity}</TableCell>
-                      <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                  products.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell>{product.category}</TableCell>
                       <TableCell>
-                        <Badge variant="default" className="bg-success">Approved</Badge>
+                        <Badge variant="secondary">{product.color}</Badge>
+                      </TableCell>
+                      <TableCell>{product.quantity}</TableCell>
+                      <TableCell>IDR {product.price.toLocaleString()}</TableCell>
+                      <TableCell className="font-semibold">
+                        IDR {(product.price * product.quantity).toLocaleString()}
                       </TableCell>
                     </TableRow>
                   ))
@@ -176,10 +331,11 @@ const Analytics = () => {
           </CardContent>
         </Card>
 
+        {/* Rejected Materials */}
         <Card>
           <CardHeader>
-            <CardTitle>Rejected Materials & Quality Issues</CardTitle>
-            <CardDescription>Materials requiring quality inspection attention</CardDescription>
+            <CardTitle>Rejected Raw Materials</CardTitle>
+            <CardDescription>Live data from Rejected Items menu</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -187,27 +343,73 @@ const Analytics = () => {
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Material Name</TableHead>
-                  <TableHead>Quantity</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Quality Notes</TableHead>
+                  <TableHead>Quantity Rejected</TableHead>
+                  <TableHead>Rejection Reason</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rejectedTransactions.length === 0 ? (
+                {rejectedItems.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
                       No rejected items
                     </TableCell>
                   </TableRow>
                 ) : (
-                  rejectedTransactions.map((transaction) => (
-                    <TableRow key={transaction.id}>
-                      <TableCell>{format(new Date(transaction.transaction_date), "MMM dd, yyyy")}</TableCell>
-                      <TableCell className="font-medium">{transaction.product_name}</TableCell>
-                      <TableCell>{transaction.quantity}</TableCell>
-                      <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                  rejectedItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>{format(new Date(item.created_at), "MMM dd, yyyy")}</TableCell>
+                      <TableCell className="font-medium">{item.product_name}</TableCell>
+                      <TableCell>
+                        <Badge variant="destructive">{item.quantity}</Badge>
+                      </TableCell>
                       <TableCell className="max-w-xs text-muted-foreground">
-                        {transaction.notes || "No notes"}
+                        {item.reason}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        {/* Quality Inspections */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Quality Inspection Results</CardTitle>
+            <CardDescription>Recent material quality assessments</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Inspection Date</TableHead>
+                  <TableHead>Material Name</TableHead>
+                  <TableHead>Condition</TableHead>
+                  <TableHead>Fit for Processing</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {foodConditions.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                      No quality inspections recorded
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  foodConditions.slice(0, 10).map((condition) => (
+                    <TableRow key={condition.id}>
+                      <TableCell>{format(new Date(condition.inspection_date), "MMM dd, yyyy")}</TableCell>
+                      <TableCell className="font-medium">{condition.product_name}</TableCell>
+                      <TableCell>
+                        <Badge variant={condition.condition === "Fresh" || condition.condition === "Excellent" ? "default" : "secondary"}>
+                          {condition.condition}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={condition.fit_for_processing ? "default" : "destructive"}>
+                          {condition.fit_for_processing ? "Yes" : "No"}
+                        </Badge>
                       </TableCell>
                     </TableRow>
                   ))
